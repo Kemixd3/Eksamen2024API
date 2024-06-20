@@ -77,6 +77,12 @@ public class WebSecurityConfiguration {
             //Access to the resultater endpoints
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater/time-distance")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater/time/{disciplinId}/{deltagerId}")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater/distance/{disciplinId}/{deltagerId}")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater/point/{disciplinId}/{deltagerId}")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater/registrer/{disciplinId}")).permitAll()
+
+
 
             //Access to the disciplin endpoints
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/discipliner")).permitAll()

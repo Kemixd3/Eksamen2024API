@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DisciplinService {
@@ -22,9 +23,9 @@ public class DisciplinService {
     @Autowired
     private DeltagerRepository deltagerRepository;
 
-    public List<Disciplin> findAll() {
+/*    public List<Disciplin> findAll() {
         return disciplinRepository.findAll();
-    }
+    }*/
 
 
 
@@ -45,7 +46,21 @@ public class DisciplinService {
         disciplinRepository.save(disciplin);
     }
 
+    public List<DisciplinDTO> findAll() {
+        List<Disciplin> discipliner = disciplinRepository.findAll();
+        return discipliner.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
 
+    private DisciplinDTO mapToDTO(Disciplin disciplin) {
+        DisciplinDTO disciplinDTO = new DisciplinDTO();
+        disciplinDTO.setId(disciplin.getId());
+        disciplinDTO.setNavn(disciplin.getNavn());
+        disciplinDTO.setResultattype(disciplin.getResultattype());
+        // Map other fields as needed
+        return disciplinDTO;
+    }
 
     @Transactional
     public Disciplin createDisciplin(DisciplinDTO dto) {

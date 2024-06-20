@@ -8,6 +8,7 @@ import ProgrammeringsEksamenAPI.repository.DisciplinRepository;
 import dto.deltager.DeltagerDTO;
 import dto.deltager.DeltagerMedDisciplinerDTO;
 import dto.deltager.DeltagerWithDisciplinDTO;
+import dto.deltager.DeltagerWithoutResultaterDTO;
 import dto.disciplin.DisciplinDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +36,38 @@ public class DeltagerController {
 
 
     @GetMapping
-    public List<Deltager> getAllDeltagere() {
-        return deltagerRepository.findAll();
+    public List<DeltagerWithoutResultaterDTO> getAllDeltagere() {
+        List<Deltager> deltagerList = deltagerRepository.findAll();
+        List<DeltagerWithoutResultaterDTO> deltagerDTOList = new ArrayList<>();
+
+        for (Deltager deltager : deltagerList) {
+            DeltagerWithoutResultaterDTO deltagerDTO = new DeltagerWithoutResultaterDTO();
+            deltagerDTO.setId(deltager.getId());
+            deltagerDTO.setNavn(deltager.getNavn());
+            deltagerDTO.setKøn(deltager.getKøn());
+            deltagerDTO.setAlder(deltager.getAlder());
+            deltagerDTO.setKlub(deltager.getKlub());
+            deltagerDTO.setAlderGroup(deltager.getAlderGroup()); // If needed
+
+            // Map discipliner (and exclude resultater)
+            List<DisciplinDTO> disciplinDTOList = new ArrayList<>();
+            for (Disciplin disciplin : deltager.getDiscipliner()) {
+                DisciplinDTO disciplinDTO = new DisciplinDTO();
+                disciplinDTO.setId(disciplin.getId());
+                disciplinDTO.setNavn(disciplin.getNavn());
+                disciplinDTO.setResultattype(disciplin.getResultattype());
+                // You can optionally map resultater here
+
+                disciplinDTOList.add(disciplinDTO);
+            }
+            deltagerDTO.setDiscipliner(disciplinDTOList);
+
+            deltagerDTOList.add(deltagerDTO);
+        }
+
+        return deltagerDTOList;
     }
+
 
   /*  @PostMapping
     public Deltager createDeltager(@Valid @RequestBody Deltager deltager) {

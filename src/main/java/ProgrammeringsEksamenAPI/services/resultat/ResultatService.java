@@ -43,7 +43,7 @@ public class ResultatService {
         resultat.setDeltager(deltager);
         resultat.setDisciplin(disciplin);
         resultat.setDato(dto.getDato());
-        resultat.setTime(dto.getTime());
+        resultat.setTimeTaken(dto.getTime());
         resultat.setDistance(dto.getDistance());
 
         return resultatRepository.save(resultat);
@@ -63,11 +63,11 @@ public class ResultatService {
 
         Resultat resultat;
         switch (resultatDTO.getResultatType()) {
-            case TIME:
+         /*   case TIME:
                 TimeResultat timeResultat = new TimeResultat();
-                timeResultat.setTime(resultatDTO.getTid());
+                timeResultat.setDato(resultatDTO.getTid());
                 resultat = timeResultat;
-                break;
+                break;*/
             case DISTANCE:
                 DistanceResultat distanceResultat = new DistanceResultat();
                 distanceResultat.setDistance(resultatDTO.getAfstand());
@@ -75,7 +75,7 @@ public class ResultatService {
                 break;
             case POINT:
                 PointResultat pointResultat = new PointResultat();
-                pointResultat.setPoint(resultatDTO.getPoint());
+                pointResultat.setPoints(resultatDTO.getPoint());
                 resultat = pointResultat;
                 break;
             default:

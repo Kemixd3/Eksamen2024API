@@ -1,6 +1,7 @@
 package ProgrammeringsEksamenAPI.models;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -31,7 +32,9 @@ public class Deltager {
     //private List<Resultat> resultater = new ArrayList<>();
 
 
-    @OneToMany(mappedBy = "deltager")
+    //@OneToMany(mappedBy = "deltager")
+    @OneToMany(mappedBy = "deltager", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Resultat> resultater;
 
 

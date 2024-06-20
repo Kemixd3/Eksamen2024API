@@ -25,8 +25,8 @@ public class DisciplinController {
 
 
     @GetMapping
-    public ResponseEntity<List<Disciplin>> getAllDiscipliner() {
-        List<Disciplin> discipliner = disciplinService.findAll();
+    public ResponseEntity<List<DisciplinDTO>> getAllDiscipliner() {
+        List<DisciplinDTO> discipliner = disciplinService.findAll();
         return ResponseEntity.ok(discipliner);
     }
 }

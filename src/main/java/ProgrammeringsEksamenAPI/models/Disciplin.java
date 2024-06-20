@@ -1,6 +1,7 @@
 package ProgrammeringsEksamenAPI.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "discipliner")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Disciplin {
 
     @Id

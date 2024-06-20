@@ -6,10 +6,13 @@ import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Entity
 @DiscriminatorValue("point")
 @Getter
 @Setter
 public class PointResultat extends Resultat {
-    private Integer point;
+    private LocalDate dato;
+    private Integer points;
 }

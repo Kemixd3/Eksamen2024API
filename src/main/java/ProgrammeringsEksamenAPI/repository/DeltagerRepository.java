@@ -14,6 +14,9 @@ public interface DeltagerRepository extends JpaRepository<Deltager, Long> {
 
     List<Deltager> findByNavnContainingIgnoreCase(String navn);
 
+
+    @Query("SELECT DISTINCT d FROM Deltager d LEFT JOIN FETCH d.discipliner")
+    List<Deltager> findAllWithDiscipliner();
     @Query(value = "SELECT DISTINCT d.* " +
             "FROM deltagere d " +
             "LEFT JOIN deltager_disciplin dd ON d.id = dd.deltager_id " +
