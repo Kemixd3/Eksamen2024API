@@ -50,7 +50,10 @@ public class ResultatService {
     }
 
 
-
+    @Transactional
+    public void deleteResultat(Long deltagerId, Long resultatId) {
+        resultatRepository.deleteByIdAndDeltagerId(resultatId, deltagerId);
+    }
 
 
     @Transactional

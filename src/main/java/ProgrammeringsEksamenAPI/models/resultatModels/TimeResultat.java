@@ -15,5 +15,5 @@ import java.time.LocalTime;
 @Setter
 public class TimeResultat extends Resultat {
     private LocalDate dato;
-    private Float timeTaken;
+    //private Float timeTaken;
 }

@@ -81,6 +81,11 @@ public class WebSecurityConfiguration {
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater/distance/{disciplinId}/{deltagerId}")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater/point/{disciplinId}/{deltagerId}")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater/registrer/{disciplinId}")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/resultater/{deltagerId}/resultater")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/resultater/{deltagerId}/resultater/{resultatId}")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PATCH, "/api/resultater/{resultatId}")).permitAll()
+
+
 
 
 

@@ -8,22 +8,24 @@ import ProgrammeringsEksamenAPI.models.resultatModels.TimeDistanceResultat;
 import ProgrammeringsEksamenAPI.models.resultatModels.TimeResultat;
 import ProgrammeringsEksamenAPI.repository.DeltagerRepository;
 import ProgrammeringsEksamenAPI.repository.DisciplinRepository;
+import ProgrammeringsEksamenAPI.repository.ResultatRepository;
 import ProgrammeringsEksamenAPI.services.resultat.ResultatServiceInterface;
 import dto.resultat.PointResultatDTO;
 import dto.resultat.ResultatDTO;
 import dto.resultat.ResultatRequest;
 import dto.resultat.TimeDistanceResultatDTO;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ProgrammeringsEksamenAPI.services.resultat.ResultatService;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -37,11 +39,17 @@ public class ResultatController {
     @Autowired
     private ResultatServiceInterface resultatServiceInterface;
 
+    private static final Logger logger = LoggerFactory.getLogger(DeltagerController.class);
+
+
     @Autowired
     private DisciplinRepository disciplinRepository;
 
     @Autowired
     private DeltagerRepository deltagerRepository;
+
+    @Autowired
+    private ResultatRepository resultatRepository;
 
     @PostMapping("/time-distance")
     public ResponseEntity<TimeDistanceResultat> createTimeDistanceResultat(@Valid @RequestBody TimeDistanceResultatDTO dto) {
@@ -119,25 +127,57 @@ public class ResultatController {
 
 
 
+    @PatchMapping("/{resultatId}")
+    public ResponseEntity<Resultat> patchResultat(
+            @PathVariable Long resultatId,
+            @RequestBody Resultat updatedResultat
+    ) {
+        return resultatRepository.findById(resultatId)
+                .map(resultat -> {
+                    // Update fields if provided in the request body
+                    if (updatedResultat.getTimeTaken() != null) {
+                        resultat.setTimeTaken(updatedResultat.getTimeTaken());
+                    }
+                    // Add more fields if needed for updating
+
+                    // Save the updated resultat
+                    Resultat savedResultat = resultatRepository.save(resultat);
+                    return ResponseEntity.ok(savedResultat);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+
+
     @GetMapping("/{deltagerId}/resultater")
-    public ResponseEntity<List<Resultat>> getResultaterForDeltager(@PathVariable Long deltagerId) {
+    public ResponseEntity<List<Map<String, Object>>> getResultaterForDeltager(@PathVariable Long deltagerId) {
         Optional<Deltager> deltagerOptional = deltagerRepository.findById(deltagerId);
 
         if (deltagerOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        Deltager deltager = deltagerOptional.get();
-        List<Resultat> resultater = new ArrayList<>();
-
-        // Add logic to fetch resultater for the deltager
-        for (Disciplin disciplin : deltager.getDiscipliner()) {
-            resultater.addAll(disciplin.getResultater().stream()
-                    .filter(resultat -> resultat.getDeltager().equals(deltager))
-                    .collect(Collectors.toList()));
-        }
+        // Fetch results along with discipline information
+        List<Map<String, Object>> resultater = resultatRepository.findResultaterWithDisciplinByDeltagerId(deltagerId);
 
         return ResponseEntity.ok(resultater);
+    }
+
+
+
+    @DeleteMapping("/{deltagerId}/resultater/{resultatId}")
+    public ResponseEntity<?> deleteResultat(
+            @PathVariable Long deltagerId,
+            @PathVariable Long resultatId
+    ) {
+        try {
+            resultatService.deleteResultat(deltagerId, resultatId);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 

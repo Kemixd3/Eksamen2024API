@@ -34,6 +34,13 @@ public abstract class Resultat {
     @JoinColumn(name = "disciplin_id", nullable = false)
     private Disciplin disciplin;
 
-    // Constructors, getters, setters
+
+    @Column(name = "time_taken")
+    private Float timeTaken;
+    @Column(name = "distance")
+    private Double distance;
+
+
+
 }
 
