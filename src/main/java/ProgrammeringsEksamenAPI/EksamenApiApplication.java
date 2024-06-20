@@ -14,8 +14,6 @@ import util.dataSeeder.DisciplinDataSeeder;
 @ComponentScan(basePackages = {"ProgrammeringsEksamenAPI", "util.dataSeeder"})
 
 public class EksamenApiApplication implements CommandLineRunner {
-
-
     @Autowired
     private DisciplinDataSeeder disciplinDataSeeder;
     public static void main(String[] args) {

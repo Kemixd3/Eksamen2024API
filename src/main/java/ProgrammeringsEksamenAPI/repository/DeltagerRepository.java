@@ -23,12 +23,15 @@ public interface DeltagerRepository extends JpaRepository<Deltager, Long> {
             "AND (:maxAlder IS NULL OR d.alder <= :maxAlder) " +
             "AND (:klub IS NULL OR LOWER(d.klub) = LOWER(:klub)) " +
             "AND (:disciplin IS NULL OR LOWER(di.navn) = LOWER(:disciplin)) " +
+            "AND (:navn IS NULL OR LOWER(d.navn) LIKE LOWER(CONCAT('%', :navn, '%'))) " +
             "LIMIT 10",
             nativeQuery = true)
     List<Deltager> filterDeltagere(@Param("køn") String køn,
                                    @Param("minAlder") Integer minAlder,
                                    @Param("maxAlder") Integer maxAlder,
                                    @Param("klub") String klub,
-                                   @Param("disciplin") String disciplin);
+                                   @Param("disciplin") String disciplin,
+                                   @Param("navn") String navn);
+
 
 }

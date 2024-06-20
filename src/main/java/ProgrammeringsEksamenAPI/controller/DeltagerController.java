@@ -6,7 +6,9 @@ import ProgrammeringsEksamenAPI.models.Disciplin;
 import ProgrammeringsEksamenAPI.repository.DeltagerRepository;
 import ProgrammeringsEksamenAPI.repository.DisciplinRepository;
 import dto.deltager.DeltagerDTO;
+import dto.deltager.DeltagerMedDisciplinerDTO;
 import dto.deltager.DeltagerWithDisciplinDTO;
+import dto.disciplin.DisciplinDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -106,6 +108,48 @@ public class DeltagerController {
 
 
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<DeltagerDTO> updateDeltager(
+            @PathVariable Long id,
+            @Valid @RequestBody DeltagerWithDisciplinDTO deltagerRequest) {
+
+        Deltager deltager = deltagerRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Deltager not found with id: " + id));
+
+        deltager.setNavn(deltagerRequest.getNavn());
+        deltager.setKøn(deltagerRequest.getKøn());
+        deltager.setAlder(deltagerRequest.getAlder());
+        deltager.setKlub(deltagerRequest.getKlub());
+
+        List<Disciplin> discipliner = new ArrayList<>();
+        for (Long disciplinId : deltagerRequest.getDisciplinerIds()) {
+            Disciplin disciplin = disciplinRepository.findById(disciplinId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Disciplin not found with id: " + disciplinId));
+            discipliner.add(disciplin);
+        }
+
+        deltager.setDiscipliner(discipliner);
+
+        Deltager updatedDeltager = deltagerRepository.save(deltager);
+
+        // Convert updatedDeltager to DeltagerDTO
+        DeltagerDTO deltagerDTO = new DeltagerDTO();
+        deltagerDTO.setId(updatedDeltager.getId());
+        deltagerDTO.setNavn(updatedDeltager.getNavn());
+        deltagerDTO.setKøn(updatedDeltager.getKøn());
+        deltagerDTO.setAlder(updatedDeltager.getAlder());
+        deltagerDTO.setKlub(updatedDeltager.getKlub());
+
+        List<Long> disciplinerIds = updatedDeltager.getDiscipliner().stream()
+                .map(Disciplin::getId)
+                .collect(Collectors.toList());
+        deltagerDTO.setDisciplinerIds(disciplinerIds);
+
+        return ResponseEntity.ok().body(deltagerDTO);
+    }
+
+
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Deltager> getDeltagerById(@PathVariable(value = "id") Long deltagerId) {
@@ -138,30 +182,47 @@ public class DeltagerController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<List<DeltagerDTO>> filterDeltagere(
+    public ResponseEntity<List<DeltagerMedDisciplinerDTO>> filterDeltagere(
             @RequestParam(required = false) String køn,
             @RequestParam(required = false) Integer minAlder,
             @RequestParam(required = false) Integer maxAlder,
             @RequestParam(required = false) String klub,
-            @RequestParam(required = false) String disciplin) {
+            @RequestParam(required = false) String disciplin,
+            @RequestParam(required = false) String navn,
+            @RequestParam(required = false) String alderGroup) {
 
-        List<Deltager> deltagerList = deltagerRepository.filterDeltagere(køn, minAlder, maxAlder, klub, disciplin);
+        // Convert empty strings to null
+        køn = (køn != null && køn.isEmpty()) ? null : køn;
+        klub = (klub != null && klub.isEmpty()) ? null : klub;
+        disciplin = (disciplin != null && disciplin.isEmpty()) ? null : disciplin;
+        navn = (navn != null && navn.isEmpty()) ? null : navn;
+
+        List<Deltager> deltagerList = deltagerRepository.filterDeltagere(køn, minAlder, maxAlder, klub, disciplin, navn);
+
+
+        if (alderGroup != null && !alderGroup.isEmpty()) {
+            deltagerList = deltagerList.stream()
+                    .filter(deltager -> deltager.getAlderGroup().equalsIgnoreCase(alderGroup))
+                    .collect(Collectors.toList());
+        }
 
         if (deltagerList.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
         // Convert entities to DTOs
-        List<DeltagerDTO> dtoList = deltagerList.stream()
-                .map(this::convertToDto) // Using method reference to a conversion method
+        List<DeltagerMedDisciplinerDTO> dtoList = deltagerList.stream()
+                .map(this::convertToDeltagerMedDisciplinerDTO)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok().body(dtoList);
     }
 
+
     // Helper method to convert Deltager entity to DeltagerDTO
     private DeltagerDTO convertToDto(Deltager deltager) {
         DeltagerDTO dto = new DeltagerDTO();
+        dto.setId(deltager.getId());
         dto.setNavn(deltager.getNavn());
         dto.setKøn(deltager.getKøn());
         dto.setAlder(deltager.getAlder());
@@ -174,6 +235,28 @@ public class DeltagerController {
 
         return dto;
     }
+
+
+    private DeltagerMedDisciplinerDTO convertToDeltagerMedDisciplinerDTO(Deltager deltager) {
+        DeltagerMedDisciplinerDTO dto = new DeltagerMedDisciplinerDTO();
+        dto.setId(deltager.getId());
+        dto.setNavn(deltager.getNavn());
+        dto.setKøn(deltager.getKøn());
+        dto.setAlder(deltager.getAlder());
+        dto.setKlub(deltager.getKlub());
+
+        List<DisciplinDTO> disciplinDTOs = deltager.getDiscipliner().stream().map(disciplin -> {
+            DisciplinDTO disciplinDTO = new DisciplinDTO();
+            disciplinDTO.setId(disciplin.getId());
+            disciplinDTO.setNavn(disciplin.getNavn());
+            disciplinDTO.setResultattype(disciplin.getResultattype());
+            return disciplinDTO;
+        }).collect(Collectors.toList());
+
+        dto.setDisciplinerIds(disciplinDTOs);
+        return dto;
+    }
+
 
 
 

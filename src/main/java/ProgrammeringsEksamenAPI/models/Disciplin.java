@@ -24,6 +24,11 @@ public class Disciplin {
     @OneToMany(mappedBy = "disciplin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Resultat> resultater = new ArrayList<>();
 
-    // Constructors, getters, setters
+
+    // Its late - Lazy but very easy to access resultat records
+        public void addResult(Resultat resultat) {
+            resultat.setDisciplin(this);
+            this.resultater.add(resultat);
+        }
 }
 

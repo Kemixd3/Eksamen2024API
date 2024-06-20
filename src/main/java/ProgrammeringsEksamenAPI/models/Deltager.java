@@ -43,5 +43,24 @@ public class Deltager {
     )
     private List<Disciplin> discipliner = new ArrayList<>();
 
-    // Constructors, getters, setters
+
+
+    @Transient
+    public String getAlderGroup() {
+        if (alder >= 6 && alder <= 9) {
+            return "Børn (6-9)";
+        } else if (alder >= 10 && alder <= 13) {
+            return "Unge (10-13)";
+        } else if (alder >= 14 && alder <= 22) {
+            return "Junior (14-22)";
+        } else if (alder >= 23 && alder <= 40) {
+            return "Voksne (23-40)";
+        } else if (alder >= 41) {
+            return "Senior (41+)";
+        } else {
+            return "Ukendt";
+        }
+    }
+
+
 }

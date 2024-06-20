@@ -62,67 +62,36 @@ public class WebSecurityConfiguration {
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/auth/login")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/user-with-role")).permitAll() //Clients can create a user for themself
 
-            //This is for demo purposes only, and should be removed for a real system
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/demo/anonymous")).permitAll()
 
-            //Access to the films endpoints
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/films")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/films")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/films")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/films")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/films/*")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/films/{id}")).permitAll()
+
+            //Access to the deltagere endpoints
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/deltagere")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PATCH, "/api/deltagere/{id}")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/deltagere")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/deltagere/{id}")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/deltagere/search")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/deltagere/filter")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/deltagere/{id}")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/")).permitAll()
 
-             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/screeningsUsingId")).permitAll()
+            //Access to the resultater endpoints
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater/time-distance")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater")).permitAll()
+
+            //Access to the disciplin endpoints
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/discipliner")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/discipliner")).permitAll()
 
 
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PATCH, "/api/films/{id}/thumbnail")).permitAll()
 
 
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/tickets/screening/{id}")).permitAll()
-
-
-
-
-            //Allow for swagger-ui
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/screenings")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/screenings")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/film/screenings")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/film/screenings/*")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/film/screenings/{id}")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/screenings/*")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/screenings/{id}")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/screenings")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/screenings")).permitAll()
-
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/tickets")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/tickets")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/tickets")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/tickets")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/tickets/buy")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/tickets/reserve  ")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/tickets/screening/{id}")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/tickets/screening/{id}")).permitAll()
-
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/seats")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/seats")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/seats")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/seats")).permitAll()
-
-
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/theater")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/theater")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/theater")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/theater")).permitAll()
-
+            //swagger
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/swagger-ui/**")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/swagger-resources/**")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/v3/api-docs/**")).permitAll()
 
             //Required for error responses
             .requestMatchers(mvcMatcherBuilder.pattern("/error")).permitAll()
-
 
             // Only ADMIN role can access these endpoints
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/categories/*")).hasAuthority("ADMIN")
@@ -149,8 +118,8 @@ public class WebSecurityConfiguration {
             //.requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/test/admin-only")).hasAuthority("ADMIN")
 
             //Use this to completely disable security (Will not work if endpoints has been marked with @PreAuthorize)
-            .requestMatchers(mvcMatcherBuilder.pattern("/**")).permitAll());
-            //.anyRequest().authenticated());
+            //.requestMatchers(mvcMatcherBuilder.pattern("/**")).permitAll());
+            .anyRequest().authenticated());
 
 
     return http.build();
