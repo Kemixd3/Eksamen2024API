@@ -2,6 +2,7 @@ package ProgrammeringsEksamenAPI.models;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -14,6 +15,7 @@ import java.util.List;
 @Setter
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "deltagere")
 public class Deltager {
 
@@ -33,12 +35,12 @@ public class Deltager {
 
 
     //@OneToMany(mappedBy = "deltager")
-    @OneToMany(mappedBy = "deltager", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "deltager", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Resultat> resultater;
 
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "deltager_disciplin",
             joinColumns = @JoinColumn(name = "deltager_id"),

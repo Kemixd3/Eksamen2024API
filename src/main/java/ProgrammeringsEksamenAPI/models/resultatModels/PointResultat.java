@@ -14,5 +14,5 @@ import java.time.LocalDate;
 @Setter
 public class PointResultat extends Resultat {
     private LocalDate dato;
-    private Integer points;
+    //private Integer points;
 }

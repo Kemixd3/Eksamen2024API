@@ -40,7 +40,7 @@ public class ResultatServiceImpl implements ResultatServiceInterface {
         // Assuming points is not needed for addTimeResultat, pass null or a default value
         Integer points = null; // or provide a default value if needed
 
-        return addResultat(disciplinId, deltagerId, points, request.getDato(), request.getTimeTaken(), "time", null);
+        return addResultat(disciplinId, deltagerId, points, request.getDato(), request.getTimeTaken(), "time", request.getDistance());
     }
 
     @Override

@@ -14,7 +14,6 @@ import java.time.LocalTime;
 @Getter
 @Setter
 public class TimeDistanceResultat extends Resultat {
-    private Float timeTaken;     // in seconds
-    private Double distance; // in meters
-    //private LocalDate dato;
+
+
 }

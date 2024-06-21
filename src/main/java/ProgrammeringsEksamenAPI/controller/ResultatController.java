@@ -41,7 +41,6 @@ public class ResultatController {
 
     private static final Logger logger = LoggerFactory.getLogger(DeltagerController.class);
 
-
     @Autowired
     private DisciplinRepository disciplinRepository;
 
@@ -62,7 +61,6 @@ public class ResultatController {
         ResultatDTO createdResultat = resultatService.createResultat(resultatDTO);
         return ResponseEntity.ok(createdResultat);
     }
-
 
 
 
@@ -126,27 +124,37 @@ public class ResultatController {
     }
 
 
-
     @PatchMapping("/{resultatId}")
     public ResponseEntity<Resultat> patchResultat(
             @PathVariable Long resultatId,
             @RequestBody Resultat updatedResultat
     ) {
-        return resultatRepository.findById(resultatId)
-                .map(resultat -> {
-                    // Update fields if provided in the request body
-                    if (updatedResultat.getTimeTaken() != null) {
-                        resultat.setTimeTaken(updatedResultat.getTimeTaken());
-                    }
-                    // Add more fields if needed for updating
 
-                    // Save the updated resultat
-                    Resultat savedResultat = resultatRepository.save(resultat);
-                    return ResponseEntity.ok(savedResultat);
-                })
-                .orElse(ResponseEntity.notFound().build());
+        Resultat existingResultat = resultatRepository.findById(resultatId)
+                .orElse(null);
+
+        if (existingResultat == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (updatedResultat.getTimeTaken() != null) {
+            existingResultat.setTimeTaken(updatedResultat.getTimeTaken());
+        }
+
+
+        if (updatedResultat.getPoints() != null) {
+            existingResultat.setPoints(updatedResultat.getPoints());
+        }
+
+
+        if (updatedResultat.getDistance() != null) {
+            existingResultat.setDistance(updatedResultat.getDistance());
+        }
+
+
+        Resultat savedResultat = resultatRepository.save(existingResultat);
+        return ResponseEntity.ok(savedResultat);
     }
-
 
 
     @GetMapping("/{deltagerId}/resultater")
@@ -164,7 +172,6 @@ public class ResultatController {
     }
 
 
-
     @DeleteMapping("/{deltagerId}/resultater/{resultatId}")
     public ResponseEntity<?> deleteResultat(
             @PathVariable Long deltagerId,
@@ -179,8 +186,6 @@ public class ResultatController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-
 
 
     @PostMapping("/distance/{disciplinId}/{deltagerId}")
@@ -210,13 +215,6 @@ public class ResultatController {
     }
 
 
-
-
-
-
-
-
-
     @PostMapping("/registrer/{disciplinId}")
     public ResponseEntity<?> registrerResultater(
             @PathVariable Long disciplinId,
@@ -233,7 +231,7 @@ public class ResultatController {
                 case "time":
                     response = resultatServiceInterface.addTimeResultat(disciplinId, deltagerId, request);
                     break;
-                case "time_distance":
+                case "distance":
                     response = resultatServiceInterface.addDistanceResultat(disciplinId, deltagerId, request);
                     break;
                 default:
