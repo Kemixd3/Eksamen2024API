@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 @SpringBootTest
 @Transactional
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -43,7 +42,7 @@ public class ResultatIntegrationTest {
 
     @Autowired
     private ResultatServiceInterface resultatService2;
-
+    // Det var lige de integrations tests jeg kunne nå og som føler giver mest mening. Oprette deltager, discipliner og resultater
     @Test
     public void testCreateDisciplinDeltagerAndResultat() {
         // Opret Disciplin
