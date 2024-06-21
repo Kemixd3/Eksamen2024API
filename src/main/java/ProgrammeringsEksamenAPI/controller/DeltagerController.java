@@ -68,39 +68,6 @@ public class DeltagerController {
         return deltagerDTOList;
     }
 
-
-  /*  @PostMapping
-    public Deltager createDeltager(@Valid @RequestBody Deltager deltager) {
-        return deltagerRepository.save(deltager);
-    }*/
-
-
-
- /*   @PostMapping
-    public ResponseEntity<Deltager> createDeltager(@Valid @RequestBody DeltagerWithDisciplinDTO deltagerRequest) {
-        Deltager deltager = new Deltager();
-        deltager.setNavn(deltagerRequest.getNavn());
-        deltager.setKøn(deltagerRequest.getKøn()); // Assuming this should be set correctly
-        deltager.setAlder(deltagerRequest.getAlder());
-        deltager.setKlub(deltagerRequest.getKlub());
-
-        // Fetch Disciplin objects from repository based on ids
-        List<Disciplin> discipliner = new ArrayList<>();
-        for (Long disciplinId : deltagerRequest.getDisciplinerIds()) {
-            Disciplin disciplin = disciplinRepository.findById(disciplinId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Disciplin not found with id: " + disciplinId));
-            discipliner.add(disciplin);
-        }
-
-        deltager.setDiscipliner(discipliner);
-
-        Deltager savedDeltager = deltagerRepository.save(deltager);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedDeltager);
-    }*/
-
-
-
-
     @PostMapping
     public ResponseEntity<DeltagerDTO> createDeltager(@Valid @RequestBody DeltagerWithDisciplinDTO deltagerRequest) {
         Deltager deltager = new Deltager();
@@ -135,8 +102,6 @@ public class DeltagerController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(deltagerDTO);
     }
-
-
 
     @PatchMapping("/{id}")
     public ResponseEntity<DeltagerDTO> updateDeltager(
@@ -179,8 +144,6 @@ public class DeltagerController {
     }
 
 
-
-
     @GetMapping("/{id}")
     public ResponseEntity<Deltager> getDeltagerById(@PathVariable(value = "id") Long deltagerId) {
         Deltager deltager = deltagerRepository.findById(deltagerId)
@@ -188,7 +151,6 @@ public class DeltagerController {
 
         return ResponseEntity.ok().body(deltager);
     }
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDeltager(@PathVariable(value = "id") Long deltagerId) {
@@ -198,7 +160,6 @@ public class DeltagerController {
         deltagerRepository.delete(deltager);
         return ResponseEntity.noContent().build();
     }
-
 
     @GetMapping("/search")
     public ResponseEntity<List<Deltager>> searchDeltagereByName(@RequestParam(value = "navn") String navn) {
@@ -240,7 +201,6 @@ public class DeltagerController {
             return ResponseEntity.noContent().build();
         }
 
-        // Convert entities to DTOs
         List<DeltagerMedDisciplinerDTO> dtoList = deltagerList.stream()
                 .map(this::convertToDeltagerMedDisciplinerDTO)
                 .collect(Collectors.toList());
@@ -249,7 +209,7 @@ public class DeltagerController {
     }
 
 
-    // Helper method to convert Deltager entity to DeltagerDTO
+    // Helper method whoops to convert Deltager entity to DeltagerDTO
     private DeltagerDTO convertToDto(Deltager deltager) {
         DeltagerDTO dto = new DeltagerDTO();
         dto.setId(deltager.getId());
@@ -265,7 +225,6 @@ public class DeltagerController {
 
         return dto;
     }
-
 
     private DeltagerMedDisciplinerDTO convertToDeltagerMedDisciplinerDTO(Deltager deltager) {
         DeltagerMedDisciplinerDTO dto = new DeltagerMedDisciplinerDTO();
@@ -287,16 +246,4 @@ public class DeltagerController {
         return dto;
     }
 
-
-
-
-
-  /*  @GetMapping("/{id}")
-    public ResponseEntity<Deltager> getDeltagerById(@PathVariable(value = "id") Long deltagerId) {
-        Deltager deltager = deltagerRepository.findById(deltagerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Deltager not found for this id :: " + deltagerId));
-        return ResponseEntity.ok().body(deltager);
-    }*/
-
-    // Other CRUD operations can be added here
 }

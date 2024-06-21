@@ -26,6 +26,7 @@ public class Resultat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "dato")
     private LocalDate dato;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,7 +37,6 @@ public class Resultat {
     @JoinColumn(name = "disciplin_id", nullable = false)
     private Disciplin disciplin;
 
-
     @Column(name = "time_taken")
     private Float timeTaken;
     @Column(name = "distance")
@@ -44,8 +44,6 @@ public class Resultat {
 
     @Column(name = "points")
     private Integer points;
-
-
 
 }
 

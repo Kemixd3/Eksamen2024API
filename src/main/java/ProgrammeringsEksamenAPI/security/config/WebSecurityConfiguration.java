@@ -44,7 +44,7 @@ public class WebSecurityConfiguration {
   public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
     MvcRequestMatcher.Builder mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspector);
     http
-            .cors(Customizer.withDefaults()) //Will use the CorsConfigurationSource bean declared in CorsConfig.java
+            .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())
             .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .oauth2ResourceServer((oauth2ResourceServer) ->
@@ -61,8 +61,6 @@ public class WebSecurityConfiguration {
     http.authorizeHttpRequests((authorize) -> authorize
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/auth/login")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/user-with-role")).permitAll() //Clients can create a user for themself
-
-
 
             //Access to the deltagere endpoints
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/deltagere")).permitAll()
@@ -86,15 +84,9 @@ public class WebSecurityConfiguration {
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PATCH, "/api/resultater/{resultatId}")).permitAll()
 
 
-
-
-
             //Access to the disciplin endpoints
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/discipliner")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/discipliner")).permitAll()
-
-
-
 
             //swagger
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/swagger-ui/**")).permitAll()
@@ -104,31 +96,11 @@ public class WebSecurityConfiguration {
             //Required for error responses
             .requestMatchers(mvcMatcherBuilder.pattern("/error")).permitAll()
 
-            // Only ADMIN role can access these endpoints
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/categories/*")).hasAuthority("ADMIN")
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/categories/*")).hasAuthority("ADMIN")
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/categories")).hasAuthority("ADMIN")
-
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/html")).hasAuthority("ADMIN")
-
-            // for user and delete and put for authenticated user
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/recipes/*")).authenticated()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/recipes/*")).authenticated()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/recipes")).hasAuthority("USER")
-
-
-            // Anonymous exercise for anonymous users to access endpoints
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/categories")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/recipes")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/recipes/*")).permitAll()
 
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/info")).permitAll()
 
-            //This is for demo purposes only, and should be removed for a real system
-            //.requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/test/user-only")).hasAuthority("USER")
-            //.requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/test/admin-only")).hasAuthority("ADMIN")
-
-            //Use this to completely disable security (Will not work if endpoints has been marked with @PreAuthorize)
+            //disable security
             //.requestMatchers(mvcMatcherBuilder.pattern("/**")).permitAll());
             .anyRequest().authenticated());
 

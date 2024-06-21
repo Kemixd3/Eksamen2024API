@@ -11,7 +11,7 @@ import java.util.Arrays;
 @Configuration
 public class CorsConfig {
 
-    //When you know the domain name for your client, add it below before deployment
+    //Allowed domain names
     private static final String[] ALLOWED_ORIGINS = new String[] {
          "*",
             "http://localhost:5173",
@@ -22,8 +22,7 @@ public class CorsConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        //Use the line below instead, if you want to allow specific headers only
-        //configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "X-Requested-With"));
+
         configuration.setAllowedOriginPatterns(Arrays.asList(ALLOWED_ORIGINS));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -27,8 +27,9 @@ import java.util.Set;
 @DiscriminatorColumn(name = "DISCRIMINATOR_TYPE")
 public class UserWithRoles implements UserDetails {
 
+  // BCrypt encoded passwords always have length 60
   @Transient
-  static final int PASSWORD_MIN_LENGTH = 60;  // BCrypt encoded passwords always have length 60
+  static final int PASSWORD_MIN_LENGTH = 60;
 
   @Id
   @Column(nullable = false,length = 50,unique = true)

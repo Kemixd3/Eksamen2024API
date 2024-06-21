@@ -24,17 +24,10 @@ public class Deltager {
     private Long id;
 
     private String navn;
-    private String køn; // Assuming this is meant to be 'køn' (gender)
+    private String køn;
     private int alder;
     private String klub;
 
-
-    //OLD
-   // @OneToMany(mappedBy = "deltager", cascade = CascadeType.ALL, orphanRemoval = true)
-    //private List<Resultat> resultater = new ArrayList<>();
-
-
-    //@OneToMany(mappedBy = "deltager")
     @OneToMany(mappedBy = "deltager", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Resultat> resultater;
@@ -47,7 +40,6 @@ public class Deltager {
             inverseJoinColumns = @JoinColumn(name = "disciplin_id")
     )
     private List<Disciplin> discipliner = new ArrayList<>();
-
 
 
     @Transient

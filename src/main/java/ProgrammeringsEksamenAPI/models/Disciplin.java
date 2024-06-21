@@ -19,7 +19,6 @@ public class Disciplin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String navn;
     private String resultattype;
 
