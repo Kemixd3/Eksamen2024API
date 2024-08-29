@@ -1,5 +1,6 @@
 package ProgrammeringsEksamenAPI.security.entity;
 
+import ProgrammeringsEksamenAPI.models.DesktopClient;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -56,6 +57,20 @@ public class UserWithRoles implements UserDetails {
           joinColumns = {@JoinColumn(name = "user_username", referencedColumnName = "username")},
           inverseJoinColumns = {@JoinColumn(name = "role_roleName", referencedColumnName = "roleName")})
   Set<Role> roles = new HashSet<>();
+
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<DesktopClient> desktopClients = new HashSet<>();
+
+
+  public void addDesktopClient(DesktopClient desktopClient) {
+    desktopClients.add(desktopClient);
+    desktopClient.setUser(this);
+  }
+
+  public void removeDesktopClient(DesktopClient desktopClient) {
+    desktopClients.remove(desktopClient);
+    desktopClient.setUser(null);
+  }
 
   public UserWithRoles() {}
 

@@ -5,6 +5,9 @@ import ProgrammeringsEksamenAPI.security.dto.LoginResponse;
 import ProgrammeringsEksamenAPI.security.entity.UserWithRoles;
 import ProgrammeringsEksamenAPI.security.service.UserDetailsServiceImp;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.annotation.PostConstruct;
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +27,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import util.PcTimeReceiverSocket;
+import ProgrammeringsEksamenAPI.security.entity.Role;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.stream.Collectors.joining;
 
@@ -40,33 +49,66 @@ public class AuthenticationController {
   @Value("${app.token-expiration}")
   private long tokenExpiration;
 
-  private AuthenticationManager authenticationManager;
+  //@Value("${websocket.server.url}")
+  //private String webSocketServerUrl; // Externalize WebSocket URL to configuration
 
-  JwtEncoder encoder;
+  //private WebSocketClient webSocketClient;
+  private AuthenticationManager authenticationManager;
+  private JwtEncoder encoder;
 
   public AuthenticationController(AuthenticationConfiguration authenticationConfiguration, JwtEncoder encoder) throws Exception {
     this.authenticationManager = authenticationConfiguration.getAuthenticationManager();
     this.encoder = encoder;
   }
 
+/*  @PostConstruct
+  public void init() {
+    try {
+      URI uri = new URI(webSocketServerUrl); // Use externalized WebSocket URL
+      webSocketClient = new WebSocketClient(uri) {
+        @Override
+        public void onOpen(ServerHandshake handshakedata) {
+          System.out.println("WebSocket connection opened");
+        }
+
+        @Override
+        public void onMessage(String message) {
+          System.out.println("Received message: " + message);
+        }
+
+        @Override
+        public void onClose(int code, String reason, boolean remote) {
+          System.out.println("WebSocket connection closed");
+          // Optionally implement reconnection logic
+        }
+
+        @Override
+        public void onError(Exception ex) {
+          System.err.println("WebSocket error: " + ex.getMessage());
+        }
+      };
+      webSocketClient.connectBlocking(); // This blocks until the connection is established
+    } catch (InterruptedException | URISyntaxException e) {
+      e.printStackTrace();
+      throw new RuntimeException("Failed to initialize WebSocket client", e);
+    }
+  }*/
+
   @PostMapping("login")
   @Operation(summary = "Login", description = "Use this to login and get a token")
   public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-
     try {
       UsernamePasswordAuthenticationToken uat = new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
-      //The authenticate method will use the loadUserByUsername method in UserDetailsServiceImp
       Authentication authentication = authenticationManager.authenticate(uat);
 
       UserWithRoles user = (UserWithRoles) authentication.getPrincipal();
       Instant now = Instant.now();
-      long expiry = tokenExpiration;
       String scope = authentication.getAuthorities().stream()
               .map(GrantedAuthority::getAuthority)
               .collect(joining(" "));
 
       JwtClaimsSet claims = JwtClaimsSet.builder()
-              .issuer(tokenIssuer)  //Only this for simplicity
+              .issuer(tokenIssuer)
               .issuedAt(now)
               .expiresAt(now.plusSeconds(tokenExpiration))
               .subject(user.getUsername())
@@ -74,13 +116,51 @@ public class AuthenticationController {
               .build();
       JwsHeader jwsHeader = JwsHeader.with(() -> "HS256").build();
       String token = encoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
-      List<String> roles = user.getRoles().stream().map(role -> role.getRoleName()).toList();
+      List<String> roles = user.getRoles().stream().map(Role::getRoleName).toList();
+
+      // Start receiving data by connecting to the WebSocket server
+      new Thread(() -> {
+        try {
+          PcTimeReceiverSocket.startClient(token); // Pass the JWT token to authenticate the WebSocket connection
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }).start();
+
       return ResponseEntity.ok()
               .body(new LoginResponse(user.getUsername(), token, roles));
 
     } catch (BadCredentialsException | AuthenticationServiceException e) {
-      // AuthenticationServiceException is thrown if the user is not found
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, UserDetailsServiceImp.WRONG_USERNAME_OR_PASSWORD);
     }
   }
+
+/*
+
+  @PostMapping("send-usercommand")
+  @Operation(summary = "Send Command", description = "Send a command to the connected WinForms client.")
+  public ResponseEntity<String> sendCommand(@RequestBody Map<String, String> requestBody, Authentication authentication) {
+    String command = requestBody.get("command");
+    if (command == null || command.isEmpty()) {
+      return ResponseEntity.badRequest().body("Command cannot be empty");
+    }
+
+    try {
+      sendCommandToWebSocketServer(command);
+      return ResponseEntity.ok("Command sent successfully");
+    } catch (Exception e) {
+      e.printStackTrace(); // Log the exception for debugging
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+              .body("Failed to send command: " + e.getMessage());
+    }
+  }
+*/
+
+/*  private void sendCommandToWebSocketServer(String command) throws IOException {
+    if (webSocketClient != null && webSocketClient.isOpen()) {
+      webSocketClient.send(command);
+    } else {
+      throw new IOException("WebSocket connection is not open");
+    }
+  }*/
 }

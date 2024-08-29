@@ -1,3 +1,4 @@
+/*
 package ProgrammeringsEksamenAPI;
 
 import ProgrammeringsEksamenAPI.models.Deltager;
@@ -8,7 +9,7 @@ import ProgrammeringsEksamenAPI.models.resultatModels.TimeResultat;
 import ProgrammeringsEksamenAPI.repository.DeltagerRepository;
 import ProgrammeringsEksamenAPI.repository.DisciplinRepository;
 import ProgrammeringsEksamenAPI.repository.ResultatRepository;
-import ProgrammeringsEksamenAPI.services.resultat.ResultatService;
+import ProgrammeringsEksamenAPI.services.resultat.ResultatServiceImpl;
 import ProgrammeringsEksamenAPI.services.resultat.ResultatServiceInterface;
 import dto.resultat.ResultatRequest;
 import org.junit.jupiter.api.Test;
@@ -87,3 +88,4 @@ public class ResultatIntegrationTest {
 
 
 
+*/

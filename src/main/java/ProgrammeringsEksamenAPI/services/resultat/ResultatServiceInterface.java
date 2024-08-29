@@ -15,14 +15,14 @@ public interface ResultatServiceInterface {
     ResponseEntity<?> addTimeResultat(Long disciplinId, Long deltagerId, ResultatRequest request);
     ResponseEntity<?> addDistanceResultat(Long disciplinId, Long deltagerId, ResultatRequest request);
 
-    //TimeDistanceResultat createTimeDistanceResultat(TimeDistanceResultatDTO dto);
-    //ResultatDTO createResultat(ResultatDTO resultatDTO);
+    TimeDistanceResultat createTimeDistanceResultat(TimeDistanceResultatDTO dto);
+    ResultatDTO createResultat(ResultatDTO resultatDTO);
 
     Resultat patchResultat(Long resultatId, Resultat updatedResultat);
 
     List<Map<String, Object>> getResultaterForDeltager(Long deltagerId);
 
-    //void deleteResultat(Long deltagerId, Long resultatId);
+    void deleteResultat(Long deltagerId, Long resultatId);
 
     List<ResponseEntity<?>> registrerResultater(Long disciplinId, List<ResultatRequest> requests);
 }

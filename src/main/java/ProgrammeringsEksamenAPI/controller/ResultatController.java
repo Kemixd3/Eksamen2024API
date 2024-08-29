@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ProgrammeringsEksamenAPI.services.resultat.ResultatService;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +36,7 @@ public class ResultatController {
     @Autowired
     private ResultatServiceInterface resultatService;
 
-    @Autowired
-    private ResultatService resultatService2;
+
 
     @Autowired
     private DisciplinRepository disciplinRepository;
@@ -50,13 +49,13 @@ public class ResultatController {
 
     @PostMapping("/time-distance")
     public ResponseEntity<TimeDistanceResultat> createTimeDistanceResultat(@Valid @RequestBody TimeDistanceResultatDTO dto) {
-        TimeDistanceResultat savedResultat = resultatService2.createTimeDistanceResultat(dto);
+        TimeDistanceResultat savedResultat = resultatService.createTimeDistanceResultat(dto);
         return ResponseEntity.ok(savedResultat);
     }
 
     @PostMapping
     public ResponseEntity<ResultatDTO> createResultat(@Valid @RequestBody ResultatDTO resultatDTO) {
-        ResultatDTO createdResultat = resultatService2.createResultat(resultatDTO);
+        ResultatDTO createdResultat = resultatService.createResultat(resultatDTO);
         return ResponseEntity.ok(createdResultat);
     }
 
@@ -84,7 +83,7 @@ public class ResultatController {
             @PathVariable Long resultatId
     ) {
         try {
-            resultatService2.deleteResultat(deltagerId, resultatId);
+            resultatService.deleteResultat(deltagerId, resultatId);
             return ResponseEntity.ok().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();

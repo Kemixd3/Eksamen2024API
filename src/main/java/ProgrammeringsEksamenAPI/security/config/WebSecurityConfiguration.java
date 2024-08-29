@@ -62,18 +62,24 @@ public class WebSecurityConfiguration {
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/auth/login")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/user-with-role")).permitAll() //Clients can create a user for themself
 
+
+            //Socket
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/send-command")).permitAll()
+
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/auth/send-usercommand")).permitAll()
+
             //Access to the deltagere endpoints
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/deltagere")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PATCH, "/api/deltagere/{id}")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/deltagere")).hasAuthority("ADMIN")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PATCH, "/api/deltagere/{id}")).hasAuthority("ADMIN")
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/deltagere")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/deltagere/{id}")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/deltagere/{id}")).hasAuthority("ADMIN")
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/deltagere/search")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/deltagere/filter")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/deltagere/{id}")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/")).permitAll()
 
             //Access to the resultater endpoints
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater/time-distance")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater/time-distance")).hasAuthority("ADMIN")
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater/time/{disciplinId}/{deltagerId}")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater/distance/{disciplinId}/{deltagerId}")).permitAll()
