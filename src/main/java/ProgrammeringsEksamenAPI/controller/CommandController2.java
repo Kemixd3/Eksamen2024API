@@ -25,10 +25,10 @@ public class CommandController2 {
             // Construct URL for the WebSocket server endpoint
             String url = String.format("%s?userId=%s&command=%s", websocketServerUrl, userId, command);
 
-            // Send the command via HTTP POST
-            restTemplate.postForObject(url, null, String.class);
+            // Send the command via HTTP POST using the injected RestTemplate
+            String response = restTemplate.postForObject(url, null, String.class);
 
-            return ResponseEntity.ok("Command sent successfully");
+            return ResponseEntity.ok(response); // Return the response from the WebSocket server
 
         } catch (HttpClientErrorException e) {
             return ResponseEntity.status(e.getStatusCode()).body("Error sending command: " + e.getResponseBodyAsString());
@@ -36,5 +36,5 @@ public class CommandController2 {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error: " + e.getMessage());
         }
     }
-}
 
+}
