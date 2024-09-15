@@ -43,76 +43,50 @@ public class WebSecurityConfiguration {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
     MvcRequestMatcher.Builder mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspector);
+
     http
             .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())
-            .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .oauth2ResourceServer((oauth2ResourceServer) ->
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .oauth2ResourceServer(oauth2ResourceServer ->
                     oauth2ResourceServer
-                            .jwt((jwt) -> jwt.decoder(jwtDecoder())
-                                    .jwtAuthenticationConverter(authenticationConverter())
-                            )
+                            .jwt(jwt -> jwt.decoder(jwtDecoder()).jwtAuthenticationConverter(authenticationConverter()))
                             .authenticationEntryPoint(new CustomOAuth2AuthenticationEntryPoint())
-                            .accessDeniedHandler(new CustomOAuth2AccessDeniedHandler()));
+                            .accessDeniedHandler(new CustomOAuth2AccessDeniedHandler())
+            );
 
-    http.sessionManagement(session -> session
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    http
+            .authorizeHttpRequests(authorize -> authorize
+                    // Publicly accessible endpoints
+                    .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/updates/RELEASES")).permitAll()
+                    .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/updates/*")).permitAll()
+                    .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/updates")).permitAll()
 
-    http.authorizeHttpRequests((authorize) -> authorize
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/auth/login")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/user-with-role")).permitAll() //Clients can create a user for themself
+                    // Other public endpoints
+                    .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/auth/login")).permitAll()
+                    .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/user-with-role")).permitAll()
 
+                    // Restricted endpoints
+                    .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/deltagere")).hasAuthority("ADMIN")
+                    .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PATCH, "/api/deltagere/{id}")).hasAuthority("ADMIN")
+                    .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/deltagere")).permitAll()
+                    .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/deltagere/{id}")).hasAuthority("ADMIN")
 
-            //Socket
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/send-command")).permitAll()
+                    // Swagger endpoints
+                    .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/swagger-ui/**")).permitAll()
+                    .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/swagger-resources/**")).permitAll()
+                    .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/v3/api-docs/**")).permitAll()
 
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/auth/send-usercommand")).permitAll()
+                    // Error responses
+                    .requestMatchers(mvcMatcherBuilder.pattern("/error")).permitAll()
 
-            //Access to the deltagere endpoints
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/deltagere")).hasAuthority("ADMIN")
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PATCH, "/api/deltagere/{id}")).hasAuthority("ADMIN")
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/deltagere")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/deltagere/{id}")).hasAuthority("ADMIN")
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/deltagere/search")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/deltagere/filter")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/deltagere/{id}")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/")).permitAll()
-
-            //Access to the resultater endpoints
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater/time-distance")).hasAuthority("ADMIN")
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater/time/{disciplinId}/{deltagerId}")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater/distance/{disciplinId}/{deltagerId}")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater/point/{disciplinId}/{deltagerId}")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/resultater/registrer/{disciplinId}")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/resultater/{deltagerId}/resultater")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/resultater/{deltagerId}/resultater/{resultatId}")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PATCH, "/api/resultater/{resultatId}")).permitAll()
-
-
-            //Access to the disciplin endpoints
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/discipliner")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/discipliner")).permitAll()
-
-            //swagger
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/swagger-ui/**")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/swagger-resources/**")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/v3/api-docs/**")).permitAll()
-
-            //Required for error responses
-            .requestMatchers(mvcMatcherBuilder.pattern("/error")).permitAll()
-
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/html")).hasAuthority("ADMIN")
-
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/info")).permitAll()
-
-            //disable security
-            //.requestMatchers(mvcMatcherBuilder.pattern("/**")).permitAll());
-            .anyRequest().authenticated());
-
+                    // Default to authenticated
+                    .anyRequest().authenticated()
+            );
 
     return http.build();
   }
+
 
   @Bean
   public PasswordEncoder passwordEncoder() {

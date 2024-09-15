@@ -121,7 +121,7 @@ public class AuthenticationController {
       // Start receiving data by connecting to the WebSocket server
       new Thread(() -> {
         try {
-          PcTimeReceiverSocket.startClient(token); // Pass the JWT token to authenticate the WebSocket connection
+          //PcTimeReceiverSocket.startClient(token); // Pass the JWT token to authenticate the WebSocket connection
         } catch (Exception e) {
           e.printStackTrace();
         }
